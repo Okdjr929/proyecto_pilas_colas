@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Login y Menú Principal/Login y Menú Principal.vcxproj" Id="554ab712-46fe-4829-a24c-ab10a1cd6a94" />
+</Solution>
