@@ -11,9 +11,6 @@
 	- - SECCION AGREGAR PRODUCTO: camibar de color a la verificación: "Producto agregado exitosamente", talvez a un color verde
 	- SECCIÓN MOSTRAR PILA: Ponerle el color que tiene la opción mostrar cola
 	- PONERLE LOS MISMO COLORES DE COLA A PILA con sus mejoras
-
-
-
 */
 
 #include <iostream>
@@ -24,28 +21,215 @@
 #include <Windows.h>
 #include <stdlib.h>
 #include <limits>
+#include <queue>
+#include <cmath>
 
 #define arriba 72
 #define abajo 80
 #define enter 13
 
 using namespace std;
-string nombre; //Almacenará el nombre del usuario
-string contra; //Almacenará la contraseña del usuario
-string linea; //Almacenará la linea leida en el archivo
-string datos[2]; //Este arreglo guarda el nombre (0) y la contraseña(1) datos[2]
-int contador = 0;
-size_t posicion=0;
-int opc;
-bool repite = true;
-
 
 //COLOR DEL TEXTO
+void color(int);
+
+//MOVILIDAD EN EL MENÚ CON FLECHAS A TRAVÉS DE GOTOXY
+void gotoxy(int, int);
+
+//LOGIN DEL PROYECTO
+int login();
+
+//SIMPLIFICACION DE OPCIONES DEL MENÚ Y SUBMENÚ
+int menu(string, string[], int);
+
+//MENÚ PRINICIPAL
+int menuPrincipal();
+
+//PANTALLA DE INICIO
+void pantallaInicio();
+
+//LOGO DE LA EMPRESA
+void logo();
+
+
+//=============================
+// PROTOTIPOS Y ESTRUCT PILA
+//=============================
+//NODO-PILA
+struct NodoPila {
+	int id;
+	string nombre;
+	string descripcion;
+	NodoPila* siguiente;
+};
+void push(NodoPila*&);
+void pop(NodoPila*&);
+void buscarPila(NodoPila*, int);
+void modificarPila(NodoPila*, int);
+void mostrarPila(NodoPila*);
+void menuPila();
+
+
+
+//= ============================
+// PROTOTIPOS Y STRUCT COLA
+//=============================
+struct NodoCola {
+	int id;                // Identificador del producto
+	string nombre;         // Nombre del producto
+	string descripcion;    // Descripción del producto
+	NodoCola* siguiente;       // Puntero al siguiente nodo
+};
+
+void encolar(int id, string nombre, string descripcion);
+void mostrarCola();
+void desencolar();
+NodoCola* buscarCola(int id);
+void modificarCola(int id);
+void menuCola();
+
+//=============================
+// VARIABLES GLOBALES COLA
+//=============================
+NodoCola* frente = NULL;
+NodoCola* fin = NULL;
+
+//=============================
+// PROTOTIPO Y STRUCT LISTA SIMPLE
+//=============================
+struct NodoLista {
+	int dato;
+	NodoLista* siguiente;
+};
+
+//=============================
+// PROTOTIPOS
+//=============================
+void insertarOrdenado(NodoLista*&, int);
+void mostrarLista(NodoLista*);
+void eliminarNodoLista(NodoLista*&, int);
+void vaciarLista(NodoLista*&);
+void menuListaSimple();
+
+
+//=============================
+// PROTOTIPOS Y STRUCT LISTA DOBLE
+//=============================
+//Struct
+struct NodoDoble {
+	int id;
+	string nombre;
+	string descripcion;
+	NodoDoble* siguiente;
+	NodoDoble* anterior;
+};
+
+//Prototipos
+void insertarDoble(NodoDoble*&);
+void eliminarDoble(NodoDoble*&, int);
+void mostrarDoble(NodoDoble*);
+void buscarDoble(NodoDoble*, int);
+void modificarDoble(NodoDoble*, int);
+void vaciarDoble(NodoDoble*&);
+void menuListaDoble();
+
+//=============================
+// PROTOTIPOS, STRUCT Y VARIABLES GLOBALES LISTA CIRCULAR
+//=============================
+struct nodoCircular
+{
+	int id;
+	string nombre;
+	string descripcion;
+	nodoCircular* siguiente;
+};
+
+//Variables globales
+nodoCircular* primero;
+nodoCircular* ultimo;
+
+void insertarCircular(int, string, string);
+void borrarCircular(int);
+void mostrarCircular();
+void buscarCircular(int);
+void modificarCircular(int);
+void vaciarListaCircular();
+void menuListaCircular();
+
+//=============================
+// PROTOTIPOS, STRUCT, RECORRRIDOS Y VARIABLES GLOBALES DEL ÁRBOL BINARIO
+//=============================
+// Nodo del árbol binario
+struct NodoArbol {
+	int id;
+	string nombre;
+	string descripcion;
+
+	NodoArbol* izquierdo;
+	NodoArbol* derecho;
+};
+
+NodoArbol* raiz = NULL;
+
+// Insertar y crear nodo en el árbol
+void insertarNodo(NodoArbol*&, int, string, string);
+
+// Buscar nodo por ID
+NodoArbol* buscarNodo(NodoArbol*&, int);
+
+// Eliminar todo el árbol
+void eliminarArbol(NodoArbol*&);
+
+//Eliminar NODO
+NodoArbol* encontrarMinimo(NodoArbol*);
+void eliminarNodo(NodoArbol*&, int);
+
+void imprimirArbolCentrado(NodoArbol*);
+
+//RECORRIDO DE ÁRBOL
+		//----------PREORDEN------------
+void preOrden(NodoArbol*);
+		//----------POSTORDEN------------
+void postOrden(NodoArbol*);
+		//----------INORDEN------------
+void inOrden(NodoArbol*);
+
+void mostrarNodo(NodoArbol*);
+
+//MENU ÁRBOL
+void menuArbol();
+
+//=============================
+// PROTOTIPOS DE FUNCIONES MENU DE LISTAS
+//=============================
+void subMenuRecorrido();
+void menuListas();
+
+int main()
+{
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+
+	//login();
+	//system("cls");
+	//logo();
+	//system("cls");
+	//pantallaInicio();
+	//system("cls");
+	color(7);
+	menuPrincipal();
+}
+
+//-----------COLOR DE TEXTO--------------
+//Función para cambiar el color del texto en la consola. 
+// El parámetro 'c' representa el código de color deseado.
 void color(int c) {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
-//MOVILIDAD EN EL MENÚ CON FLECHAS A TRAVÉS DE GOTOXY
+//-----------MOVILIDAD EN EL MENÚ CON FLECHAS A TRAVÉS DE GOTOXY--------------
+//Función para mover el cursor a una posición específica en la consola. 
+// Los parámetros 'x' e 'y' representan las coordenadas horizontales y verticales, respectivamente.
 void gotoxy(int x, int y) {
 	COORD coord;
 	coord.X = x;
@@ -53,11 +237,22 @@ void gotoxy(int x, int y) {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-//LOGIN DEL PROYECTO
+//-----------LOGIN--------------
+//Función para manejar el proceso de inicio de sesión. 
+// Permite al usuario ingresar su nombre y contraseña, y verifica los datos contra un archivo de texto. 
+// El usuario tiene un número limitado de intentos para ingresar correctamente.
 int login() {
 	system("title LOGIN");
 	char opcion;
 	int i = 0, j = 3;
+
+	// Variables específicas para el proceso de login (ámbito local)
+	string nombre; //Almacenará el nombre del usuario
+	string contra; //Almacenará la contraseña del usuario
+	string linea; //Almacenará la linea leida en el archivo
+	string datos[2]; //Este arreglo guarda el nombre (0) y la contraseña(1)
+	int contador = 0;
+	size_t posicion = 0;
 
 	do
 	{
@@ -140,7 +335,8 @@ int login() {
 	system("PAUSE");
 }
 
-//SIMPLIFICACION DE OPCIONES DEL MENÚ Y SUBMENÚ
+//-----------SIMPLIFICACION DE OPCIONES DEL MENÚ Y SUBMENÚ--------------
+//Función para mostrar un menú interactivo en la consola.
 int menu(string titulo, string opciones[], int n) {
 	int opcionSeleccionada = 1;
 	int tecla; //Tecla capturada 
@@ -188,36 +384,332 @@ int menu(string titulo, string opciones[], int n) {
 	return opcionSeleccionada;
 }
 
+//-------------MENÚ PRINCIPAL--------------
+//Función para mostrar el menú principal del programa, que permite al usuario 
+// seleccionar entre diferentes estructuras de datos o salir del programa.
+int menuPrincipal() {
+	int n = 5;//OPCIONES DEL MENU PRINCIPAL
+	string titulo = "MEMU PRINCIPAL";
+	string opciones[] = { "Estrucutura de Pila", "Estructura de Cola", "Estructura Listas", "Estructura de Arbol","Salir" };
 
-//= ============================
-// ESTRUCTURA COLA
-//=============================
-struct NodoCola {
-	int id;                // Identificador del producto
-	string nombre;         // Nombre del producto
-	string descripcion;    // Descripción del producto
-	NodoCola* siguiente;       // Puntero al siguiente nodo
-};
+	do
+	{
+		system("cls");
+		int opc = menu(titulo, opciones, n);
+		switch (opc) {
+		case 1:
+			menuPila();
+			break;
+		case 2:
+			menuCola();
+			break;
+		case 3:
+			menuListas();
+			break;
+		case 4:
+			menuArbol();
+			break;
+		case 5:
+			return 0;
+		}
+	} while (true);
+
+	cout << endl;
+	system("pause");
+}
+
+//-----------PANTALLA DE INICIO-----------
+//Función para mostrar una pantalla de inicio con un diseño visual atractivo.
+void pantallaInicio() {
+	//LETRAS COLORIDAS
+	int xcol;
+
+	//CUADRO CON TEXTO
+	//Primera línea
+	color(14);
+	gotoxy(1, 2); cout << "╔";
+	gotoxy(1, 3); cout << "║";
+	gotoxy(1, 4); cout << "╚";
+
+	for (xcol = 2; xcol <= 118; xcol++)
+	{
+		gotoxy(xcol, 2); cout << "═";
+		gotoxy(xcol, 4); cout << "═";
+		Sleep(10);
+	}
+	gotoxy(119, 2); cout << "╗";
+	gotoxy(119, 3); cout << "║";
+	gotoxy(119, 4); cout << "╝";
+
+	//TEXTO EN EL CUADRO
+	char titulo[] = " VENTA DE AIRE ";
+	int longitud;
+	longitud = strlen(titulo);
+	int centro = (((119 - longitud) / 2) + 1); //CENTRO DE LA PANTALLA = 53
+
+	for (xcol = 2; xcol <= centro; xcol++)
+	{
+		int colorRandom = (rand() % 15) + 1;
+		color(colorRandom);
+		gotoxy(xcol, 3); cout << titulo;
+		Sleep(80);
+	}
+
+	color(7);
+	cout << "\n\n\n\n\t\t\t\t\t\tUNIVERSIDAD MARIANO GALVEZ";
+	cout << "\n\t\t\t\t\t\t  Ingenieria en Sistemas";
+
+	color(8);
+	cout << "\n\t\t\t\t\t------------------------------------------";
+
+	color(10);
+	cout << "\n\t\t\t\t\t\t  PROYECTO PILAS Y COLAS";
+
+	color(8);
+	cout << "\n\t\t\t\t\t------------------------------------------";
+
+	color(7);
+	cout << "\n\t\t\t\t\tJesus Armando Pantzey Santizo - 2290-24-24601";
+	cout << "\n\t\t\t\t\tMiqueas Otoniel Ixcaya Xajil - 2290-24-24181";
+	cout << "\n\t\t\t\t\tEli Emanuel Rosales Bala - 2290-24-14890";
+
+	color(14);
+	cout << "\n\n\t\t\t\t\t\t     PROGRAMACION III";
+
+
+	cout << endl;
+	system("pause");
+}
+
+//------------LOGO DE LA EMPRESA--------------
+//Función para mostrar el logo de la empresa con un diseño visual atractivo.
+void logo() {
+
+	color(11);
+
+	cout << "\t\t\t================================================================================\n\n";
+
+	cout << "\t\t               █████╗ ██╗██████╗ ███████╗    ████████╗███████╗ ██████╗██╗  ██╗\n";
+	cout << "\t\t              ██╔══██╗██║██╔══██╗██╔════╝    ╚══██╔══╝██╔════╝██╔════╝██║  ██║\n";
+	cout << "\t\t              ███████║██║██████╔╝█████╗         ██║   █████╗  ██║     ███████║\n";
+	cout << "\t\t              ██╔══██║██║██╔══██╗██╔══╝         ██║   ██╔══╝  ██║     ██╔══██║\n";
+	cout << "\t\t              ██║  ██║██║██║  ██║███████╗       ██║   ███████╗╚██████╗██║  ██║\n";
+	cout << "\t\t              ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝       ╚═╝   ╚══════╝ ╚═════╝╚═╝  ╚═╝\n\n";
+
+	color(9);
+
+	cout << "\t\t                            ╔═════════════════════════════╗\n";
+	cout << "\t\t                        ╔═══╝   ~ ~ ~   A I R E   ~ ~ ~   ╚═══╗\n";
+	cout << "\t\t                     ╔══╝     ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈     ╚══╗\n";
+	cout << "\t\t                   ╔═╝      ≈     ≈     ≈     ≈     ≈     ≈      ╚═╗\n";
+	cout << "\t\t                  ║         ≈        Aire embolsada       ≈         ║\n";
+	cout << "\t\t                  ║         ≈     ≈     ≈     ≈     ≈     ≈         ║\n";
+	cout << "\t\t                   ╚═╗        ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈        ╔═╝\n";
+	cout << "\t\t                     ╚══╗      >>>>>>>>>>>>>>>>>>>>>>>>>      ╔══╝\n";
+	cout << "\t\t                        ╚═══╗    >>>   >>>   >>>   >>>    ╔═══╝\n";
+	cout << "\t\t                            ╚═════════════════════════════╝\n\n";
+
+	color(10);
+	cout << "\t\t\t                   \"Respira tecnologia. Controla el aire.\"\n\n";
+
+	color(8);
+	cout << "\t\t\t================================================================================\n";
+
+	color(7);
+	_getch();
+}
 
 //=============================
-// VARIABLES GLOBALES COLA
+// DEFINICIÓN DE FUNCIONES PILA
 //=============================
-NodoCola* frente = NULL;
-NodoCola* fin = NULL;
+// Agregar un nuevo elemento a la pila (LIFO)
+void push(NodoPila*& pila) {
+	NodoPila* nuevo_nodo = new NodoPila();
+
+	cout << "\n--- Registrando Nuevo Producto ---" << endl;
+	cout << "Ingrese ID: ";
+	cin >> nuevo_nodo->id;
+	cin.ignore(10000, '\n');
+
+	cout << "Nombre del Producto: ";
+	getline(cin, nuevo_nodo->nombre);
+
+	cout << "Descripcion: ";
+	getline(cin, nuevo_nodo->descripcion);
+
+	nuevo_nodo->siguiente = pila;
+	pila = nuevo_nodo;
+
+		// Mensaje simple y coloreado
+		color(10);
+		cout << "\tProducto agregado." << endl;
+		color(7);
+}
+
+// Eliminar el último elemento agregado (LIFO)
+void pop(NodoPila*& pila) {
+	if (pila == NULL) {
+		color(12);
+		cout << "\n La pila esta vacia." << endl;
+		color(7);
+		return;
+	}
+
+	NodoPila* aux = pila;
+	pila = aux->siguiente;
+	color(10);
+	cout << "\n Producto eliminado: " << aux->nombre << " (ID: " << aux->id << ")" << endl;
+	color(7);
+	delete aux;
+	_getch();
+}
+
+// Buscar por ID
+void buscarPila(NodoPila* pila, int busqueda) {
+	NodoPila* aux = pila;
+	bool encontrado = false;
+	while (aux != NULL) {
+		if (aux->id == busqueda) {
+			encontrado = true;
+			break;
+		}
+		aux = aux->siguiente;
+	}
+	if (encontrado) {
+		color(10);
+		cout << "\nProducto encontrado:" << endl;
+		cout << "ID: " << aux->id << " | Nombre: " << aux->nombre << endl;
+		color(7);
+	}
+	else {
+		color(12);
+		cout << "\n Producto NO encontrado\n";
+		color(7);
+	}
+
+	return;
+}
+
+// Modificar un dato por ID
+void modificarPila(NodoPila* pila, int busqueda) {
+	NodoPila* aux = pila;
+	bool encontrado = false;
+
+	while (aux != NULL) {
+		if (aux->id == busqueda) {
+			encontrado = true;
+
+			cout << "\n--- Producto Encontrado ---" << endl;
+
+			cout << "ID actual: " << aux->id << endl;
+			cout << "Nombre actual: " << aux->nombre << endl;
+			cout << "Descripcion actual: " << aux->descripcion << endl;
+			cout << "\n--- Ingrese los Nuevos Datos ---" << endl;
+
+			cin.ignore(1000, '\n');
+
+			cout << "Nuevo Nombre: ";
+			getline(cin, aux->nombre);
+
+			cout << "Nueva Descripcion: ";
+			getline(cin, aux->descripcion);
+			color(10);
+			cout << "\n Dato modificado correctamente." << endl;
+			color(7);
+			break;
+		}
+		aux = aux->siguiente;
+	}
+
+	if (!encontrado) {
+		color(12); // Celeste
+		cout << "\n\n No encontrado" << endl;
+		color(7); // Celeste
+	}
+}
+
+//Mostrar datos en forma de pila (LIFO)
+void mostrarPila(NodoPila* pila) {
+	if (pila == NULL) {
+		cout << "\n Pila vacia." << endl;
+		return;
+	}
+
+	NodoPila* aux = pila;
+	color(11); // Celeste
+	cout << "\n======= INVENTARIO EN PILA (LIFO) =======" << endl;
+	while (aux != NULL) {
+		cout << "ID: " << aux->id << endl;
+		cout << "Nombre: " << aux->nombre << endl;
+		cout << "Descripcion: " << aux->descripcion << endl;
+		cout << "---------------------------------------" << endl;
+		aux = aux->siguiente;
+	}
+	color(7);
+	_getch();
+}
+
+//MENÚ DE LA PILA
+void menuPila() {
+	NodoPila* pila = NULL;
+
+	int opc;
+	string titulo = "Estructura de Pila";
+	string opciones[] = { "Ingreso de Datos de Pila", "Ver Datos en forma de Pila", "Modificar un dato", "Buscar un dato", "Eliminar un dato", "Atras (Menu Principal)" };
+	int n = sizeof(opciones) / sizeof(opciones[0]); //Tamaño del arreglo, que representa el # de opciones
+
+	do
+	{
+		opc = menu(titulo, opciones, n);
+		switch (opc) {
+		case 1:
+			//AGREGAR EL PRODUCTO
+			system("cls");
+			push(pila);
+			system("pause");
+			break;
+		case 2:
+			//MOSTRAR LA PILA
+			system("cls");
+			mostrarPila(pila);
+			break;
+		case 3:
+			//MODIFICAR
+			system("cls");
+			int id; //ID a modificar
+			cout << "Ingrese el ID del producto que desea MODIFICAR: ";
+			cin >> id;
+			modificarPila(pila, id);
+			system("pause");
+			break;
+		case 4:
+			//BUSCAR EL ID
+			system("cls");
+			int idB; //ID a buscar
+			cout << "Ingrese el ID para encontrar el producto: ";
+			cin >> idB;
+			buscarPila(pila, idB);
+			system("pause");
+			break;
+		case 5:
+			//ELIMINAR EL ÚLTIMO
+			system("cls");
+			pop(pila);
+			_getch();
+			break;
+		case 6:
+			return;
+		default:
+			cout << "Opcion invalida." << endl;
+		}
+	} while (true);
+
+	system("pause");
+}
 
 //=============================
-// PROTOTIPOS 
+// DEFINICIÓN DE FUNCIONES COLA
 //=============================
-void encolar(int id, string nombre, string descripcion);
-void mostrarCola();
-void desencolar();
-NodoCola* buscarCola(int id);
-void modificarCola(int id);
-
-//=============================
-// FUNCIONES COLA
-//=============================
-
 // Insertar datos en la cola
 void encolar(int id, string nombre, string descripcion) {
 	NodoCola* nuevo = new NodoCola();
@@ -235,6 +727,10 @@ void encolar(int id, string nombre, string descripcion) {
 	}
 
 	fin = nuevo;
+   // Mensaje simple y coloreado
+	color(10);
+	cout << "\tProducto agregado." << endl;
+	color(7);
 }
 
 // Mostrar datos (horizontal)
@@ -347,9 +843,6 @@ void menuCola() {
 			cout << "Nombre del Producto: "; getline(cin, nombre); //Guardar datos
 			cout << "Descripcion: "; getline(cin, descripcion); //Guardar datos
 			encolar(id, nombre, descripcion);
-			color(10);
-			cout << "\nDato agreagado exitosamente" << endl;
-			color(7);
 			break;
 		case 2:
 			system("cls");
@@ -378,7 +871,7 @@ void menuCola() {
 				cout << "ID: " << encontrado->id << endl;
 				cout << "Nombre: " << encontrado->nombre << endl;
 				cout << "Descripcion: " << encontrado->descripcion << endl;
-				
+
 			}
 			else {
 				color(12);
@@ -403,161 +896,10 @@ void menuCola() {
 	} while (true);
 }
 
-
-
-
-//= ============================
-// ESTRUCTURA PILA
 //=============================
-struct NodoPila {
-	int id;
-	string nombre;
-	string descripcion;
-	NodoPila* siguiente;
-};
-
-void push(NodoPila*& pila) {
-	NodoPila* nuevo_nodo = new NodoPila();
-
-	cout << "\n--- Registrando Nuevo Producto ---" << endl;
-	cout << "Ingrese ID: ";
-	cin >> nuevo_nodo->id;
-	cin.ignore(10000, '\n');
-
-	cout << "Nombre del Producto: ";
-	getline(cin, nuevo_nodo->nombre);
-
-	cout << "Descripcion: ";
-	getline(cin, nuevo_nodo->descripcion);
-
-	nuevo_nodo->siguiente = pila;
-	pila = nuevo_nodo;
-	
-	color(10);
-	cout << "\n Producto agregado exitosamente." << endl;
-	color(7);
-}
-
-void pop(NodoPila*& pila) {
-	if (pila == NULL) {
-		color(12);
-		cout << "\n La pila esta vacia." << endl;
-		color(7);
-		return;
-	}
-
-	NodoPila* aux = pila;
-	pila = aux->siguiente;
-	color(10);
-	cout << "\n Producto eliminado: " << aux->nombre << " (ID: " << aux->id << ")" << endl;
-	color(7);
-	delete aux;
-	_getch();
-}
-
-void buscarPila(NodoPila* pila, int busqueda) {
-	NodoPila* aux = pila;
-	bool encontrado = false;
-	while (aux != NULL) {
-		if (aux->id == busqueda) {
-			encontrado = true;
-			break;
-		}
-		aux = aux->siguiente;
-	}
-	if (encontrado) {
-		color(10);
-		cout << "\nProducto encontrado:" << endl;
-		cout << "ID: " << aux->id << " | Nombre: " << aux->nombre << endl;
-		color(7);
-	}
-	else {
-		color(12);
-		cout << "\n Producto NO encontrado\n";
-		color(7);
-	}
-
-	return;
-}
-
-void modificarPila(NodoPila* pila, int busqueda) {
-	NodoPila* aux = pila;
-	bool encontrado = false;
-
-	while (aux != NULL) {
-		if (aux->id == busqueda) {
-			encontrado = true;
-			
-			cout << "\n--- Producto Encontrado ---" << endl;
-			
-			cout << "ID actual: " << aux->id << endl;
-			cout << "Nombre actual: " << aux->nombre << endl;
-			cout << "Descripcion actual: " << aux->descripcion << endl;
-			cout << "\n--- Ingrese los Nuevos Datos ---" << endl;
-
-			cin.ignore(1000, '\n');
-
-			cout << "Nuevo Nombre: ";
-			getline(cin, aux->nombre);
-
-			cout << "Nueva Descripcion: ";
-			getline(cin, aux->descripcion);
-			color(10);
-			cout << "\n Dato modificado correctamente." << endl;
-			color(7);
-			break;
-		}
-		aux = aux->siguiente;
-	}
-
-	if (!encontrado) {
-		color(12); // Celeste
-		cout << "\n\n No encontrado" << endl;
-		color(7); // Celeste
-	}
-}
-
-void mostrarPila(NodoPila* pila) {
-	if (pila == NULL) {
-		cout << "\n Pila vacia." << endl;
-		return;
-	}
-
-	NodoPila* aux = pila;
-	color(11); // Celeste
-	cout << "\n======= INVENTARIO EN PILA (LIFO) =======" << endl;
-	while (aux != NULL) {
-		cout << "ID: " << aux->id << endl;
-		cout << "Nombre: " << aux->nombre << endl;
-		cout << "Descripcion: " << aux->descripcion << endl;
-		cout << "---------------------------------------" << endl;
-		aux = aux->siguiente;
-	}
-	color(7); 
-	_getch();
-}
-
-//LISTA SIMPLE
-//=============================
-// ESTRUCTURA
-//=============================
-struct NodoLista {
-	int dato;
-	NodoLista* siguiente;
-};
-
-//=============================
-// PROTOTIPOS
-//=============================
-void insertarOrdenado(NodoLista*& lista, int dato);
-void mostrarLista(NodoLista* lista);
-void eliminarNodo(NodoLista*& lista, int dato);
-void vaciarLista(NodoLista*& lista);
-void menuListaSimple();
-
+// DEFINICIÓN DE FUNCIONES LISTA-SIMPLE
 //=============================
 // INSERTAR ORDENADO (MENOR A MAYOR)
-//=============================
 void insertarOrdenado(NodoLista*& lista, int dato) {
 	NodoLista* nuevo = new NodoLista();
 	nuevo->dato = dato;
@@ -578,11 +920,14 @@ void insertarOrdenado(NodoLista*& lista, int dato) {
 	}
 
 	nuevo->siguiente = aux1;
+
+	// Mensaje simple y coloreado
+	color(10);
+	cout << "\tDato insertado." << endl;
+	color(7);
 }
 
-//=============================
 // MOSTRAR LISTA
-//=============================
 void mostrarLista(NodoLista* lista) {
 	NodoLista* aux = lista;
 
@@ -598,10 +943,8 @@ void mostrarLista(NodoLista* lista) {
 	cout << "NULL\n";
 }
 
-//=============================
 // ELIMINAR NODO (INICIO, MEDIO, FINAL)
-//=============================
-void eliminarNodo(NodoLista*& lista, int dato) {
+void eliminarNodoLista(NodoLista*& lista, int dato) {
 	if (lista == NULL) {
 		cout << "Lista vacia\n";
 		return;
@@ -631,9 +974,7 @@ void eliminarNodo(NodoLista*& lista, int dato) {
 	cout << "Dato eliminado\n";
 }
 
-//=============================
 // VACIAR LISTA
-//=============================
 void vaciarLista(NodoLista*& lista) {
 	NodoLista* aux;
 
@@ -646,9 +987,7 @@ void vaciarLista(NodoLista*& lista) {
 	cout << "Lista vaciada\n";
 }
 
-//=============================
-// MENU
-//=============================
+// MENU LISTA SIMPLE
 void menuListaSimple() {
 	NodoLista* lista = NULL;
 	int dato;
@@ -676,7 +1015,7 @@ void menuListaSimple() {
 			system("cls");
 			cout << "Dato a eliminar: ";
 			cin >> dato;
-			eliminarNodo(lista, dato);
+			eliminarNodoLista(lista, dato);
 			_getch();
 			break;
 
@@ -692,33 +1031,10 @@ void menuListaSimple() {
 	} while (true);
 }
 
-//LISTA DOBLE
-/*=====================
-	ESTRUCTURA NODO
-=====================*/
-struct NodoDoble {
-	int id;
-	string nombre;
-	string descripcion;
-	NodoDoble* siguiente;
-	NodoDoble* anterior;
-};
-
-/*=====================
-	  PROTOTIPOS
-=====================*/
-void menuListaDoble();
-void insertarDoble(NodoDoble*& lista);
-void eliminarDoble(NodoDoble*& lista, int id);
-void mostrarDoble(NodoDoble* lista);
-void buscarDoble(NodoDoble* lista, int id);
-void modificarDoble(NodoDoble* lista, int id);
-void vaciarDoble(NodoDoble*& lista);
-
-
-/*=====================
-	  INSERTAR
-=====================*/
+//=============================
+// DEFINICIÓN DE FUNCIONES LISTA-DOBLE
+//=============================
+//INSERTAR
 void insertarDoble(NodoDoble*& lista) {
 
 	NodoDoble* nuevo = new NodoDoble();
@@ -741,13 +1057,12 @@ void insertarDoble(NodoDoble*& lista) {
 
 	lista = nuevo;
 
-	cout << "Producto agregado correctamente\n";
+    color(10);
+	cout << "\tProducto agregado." << endl;
+	color(7);
 }
 
-
-/*=====================
-	  ELIMINAR
-=====================*/
+//ELIMINAR
 void eliminarDoble(NodoDoble*& lista, int id) {
 
 	if (!lista) {
@@ -779,10 +1094,7 @@ void eliminarDoble(NodoDoble*& lista, int id) {
 	delete aux;
 }
 
-
-/*=====================
-	  MOSTRAR
-=====================*/
+//MOSTRAR
 void mostrarDoble(NodoDoble* lista) {
 
 	if (!lista) {
@@ -801,10 +1113,7 @@ void mostrarDoble(NodoDoble* lista) {
 	}
 }
 
-
-/*=====================
-		BUSCAR
-=====================*/
+//BUSCAR
 void buscarDoble(NodoDoble* lista, int id) {
 
 	NodoDoble* aux = lista;
@@ -821,10 +1130,7 @@ void buscarDoble(NodoDoble* lista, int id) {
 	cout << "ID no encontrado\n";
 }
 
-
-/*=====================
-	   MODIFICAR
-=====================*/
+//MODIFICAR
 void modificarDoble(NodoDoble* lista, int id) {
 
 	NodoDoble* aux = lista;
@@ -849,10 +1155,7 @@ void modificarDoble(NodoDoble* lista, int id) {
 	cout << "ID no encontrado\n";
 }
 
-
-/*=====================
-		VACIAR
-=====================*/
+//VACIAR
 void vaciarDoble(NodoDoble*& lista) {
 
 	NodoDoble* aux;
@@ -866,16 +1169,13 @@ void vaciarDoble(NodoDoble*& lista) {
 	cout << "Lista vaciada correctamente\n";
 }
 
-
-/*=====================
-		  MENU
-=====================*/
+//MENU
 void menuListaDoble() {
 
 	NodoDoble* lista = NULL;
 	int opc, id;
 	string titulo = "Lista Doblemente Enlazadas";
-	string opciones[] = {"Insertar Producto","Eliminar Producto","Mostrar Lista","Buscar Producto","Modificar Producto","Vaciar Lista","Regresar"};
+	string opciones[] = { "Insertar Producto","Eliminar Producto","Mostrar Lista","Buscar Producto","Modificar Producto","Vaciar Lista","Regresar" };
 	int n = sizeof(opciones) / sizeof(opciones[0]);
 	do {
 		opc = menu(titulo, opciones, n);
@@ -930,30 +1230,10 @@ void menuListaDoble() {
 	} while (true);
 }
 
-
-//LISTA CIRCULAR
-struct nodoCircular
-{
-	int id;
-	string nombre;
-	string descripcion;
-	nodoCircular* siguiente;
-};
-
-nodoCircular* primero;
-nodoCircular* ultimo;
-
 //=============================
-// PROTOTIPOS
+// DEFINICIÓN DE FUNCIONES LISTA-CIRCULAR
 //=============================
-void insertarCircular(int, string, string);
-void borrarCircular(int);
-void mostrarCircular();
-void buscarCircular(int);
-void modificarCircular(int);
-void vaciarListaCircular();
-void menuListaCircular();
-
+//Insertar Lista Circular
 void insertarCircular(int id, string nombre, string descripcion) {
 	nodoCircular* nuevo = new nodoCircular();
 	nuevo->id = id;
@@ -981,10 +1261,13 @@ void insertarCircular(int id, string nombre, string descripcion) {
 
 		if (anterior == ultimo)
 			ultimo = nuevo;
-	}
-	cout << "\nID: " << nuevo->id << " ...AGREGADO" << endl;
+    }
+	color(10);
+	cout << "\tProducto agregado." << endl;
+	color(7);
 }
 
+//Borrar Un Nodo
 void borrarCircular(int id) {
 	//DEBEMOS ENCONTRAR EL NODO, RECORRER LA LISTA
 	if (primero == NULL)
@@ -1034,6 +1317,7 @@ void borrarCircular(int id) {
 		cout << "Nodo no encontrado";
 }
 
+//Mostrar Lista Circular
 void mostrarCircular() {
 	if (primero == NULL)
 	{
@@ -1052,6 +1336,7 @@ void mostrarCircular() {
 	cout << "(Regresa al inicio)" << endl;
 }
 
+//Buscar en Lista Circular
 void buscarCircular(int id) {
 	if (primero == NULL)
 	{
@@ -1082,6 +1367,7 @@ void buscarCircular(int id) {
 	}
 }
 
+//Modificar en Lista Circular
 void modificarCircular(int id) {
 	if (primero == NULL)
 	{
@@ -1116,6 +1402,7 @@ void modificarCircular(int id) {
 	}
 }
 
+//Vaciar Lista Circular
 void vaciarListaCircular() {
 	if (primero == NULL) {
 		cout << "\nLISTA VACIA, NO HAY NADA QUE VACIAR";
@@ -1134,16 +1421,18 @@ void vaciarListaCircular() {
 	cout << "\nVACIADA CORRECTAMENTE";
 }
 
+//Menu Lista Circular
 void menuListaCircular() {
-	int id;
+	int id, opc;
 	string nombre;
 	string descripcion;
 	string titulo = "Lista Circular";
 	string opciones[] = { "Insertar","Eliminar Dato","Mostrar Datos","Buscar","Modificar","Vaciar Lista","Regresar" };
 	int n = sizeof(opciones) / sizeof(opciones[0]); //Tamaño del arreglo, que representa el # de opciones
+
 	do
 	{
-		int opc = menu(titulo, opciones, n);
+		opc = menu(titulo, opciones, n);
 		switch (opc) {
 		case 1:
 			system("cls");
@@ -1194,9 +1483,55 @@ void menuListaCircular() {
 }
 
 
-
-
-
+//--------DEFINICIÓN DE FUNCIONES MENU DE LISTAS
+void subMenuRecorrido() {
+	int opc;
+	string titulo = "Recorrido de Arbol";
+	string opciones[] = { "PREORDEN", "POSTORDEN", "INORDEN", "Regresar" };
+	int n = sizeof(opciones) / sizeof(opciones[0]); //Tamaño del arreglo, que representa el # de opciones
+	do
+	{
+		system("cls");
+		opc = menu(titulo, opciones, n);
+		switch (opc) {
+		case 1:
+			if (raiz == NULL)
+			{
+				cout << "\nEl arbol esta vacio\n";
+			}
+			else {
+				cout << "\n--- RECORRIDO PREORDEN ---\n";
+				preOrden(raiz);
+			}
+			_getch();
+			break;
+		case 2:
+			if (raiz == NULL)
+			{
+				cout << "\nEl arbol esta vacio\n";
+			}
+			else {
+				cout << "\n--- RECORRIDO POSTORDEN ---\n";
+				postOrden(raiz);
+			}
+			_getch();
+			break;
+		case 3:
+			if (raiz == NULL)
+			{
+				cout << "\nEl arbol esta vacio\n";
+			}
+			else {
+				cout << "\n--- RECORRIDO INORDEN ---\n";
+				inOrden(raiz);
+			}
+			_getch();
+			break;
+		case 4:
+			return;
+		}
+	} while (true);
+}
 void menuListas() {
 	int n = 4;//OPCIONES del submenú listas
 	string titulo = "MEMU LISTAS";
@@ -1219,60 +1554,311 @@ void menuListas() {
 			menuListaCircular();
 			break;
 		case 4:
-			return;	
+			return;
 		}
 	} while (true);
 }
 
-//MENÚ DE LA PILA
-void menuPila(){
-	NodoPila* pila = NULL;
+//=============================
+// DEFINICIÓN DE FUNCIONES ARBOL BINARIO
+//=============================
+// Insertar nodo
+void insertarNodo(NodoArbol*& raiz, int id, string nombre, string descripcion) {
 
+	if (raiz == NULL) {
+
+		NodoArbol* nuevo = new NodoArbol();
+
+		nuevo->id = id;
+		nuevo->nombre = nombre;
+		nuevo->descripcion = descripcion;
+
+		nuevo->izquierdo = NULL;
+		nuevo->derecho = NULL;
+
+        raiz = nuevo;
+
+		color(10);
+		cout << "\tProducto agregado." << endl;
+		color(7);
+
+	}
+	else {
+
+		if (id < raiz->id) {
+
+			insertarNodo(raiz->izquierdo, id, nombre, descripcion);
+
+		}
+		else if (id > raiz->id) {
+
+			insertarNodo(raiz->derecho, id, nombre, descripcion);
+
+		}
+		else {
+
+			cout << "El ID ya existe\n";
+		}
+	}
+}
+
+// Buscar nodo
+NodoArbol* buscarNodo(NodoArbol*& raiz, int id) {
+
+	if (raiz == NULL) {
+
+		return NULL;
+	}
+
+	if (raiz->id == id) {
+
+		return raiz;
+	}
+
+	if (id < raiz->id) {
+
+		return buscarNodo(raiz->izquierdo, id);
+
+	}
+	else {
+
+		return buscarNodo(raiz->derecho, id);
+	}
+}
+
+//Eliminar Todo el árbol
+void eliminarArbol(NodoArbol*& raiz) {
+	if (raiz == NULL) return;
+	eliminarArbol(raiz->izquierdo);
+	eliminarArbol(raiz->derecho);
+
+	delete raiz;
+
+	raiz = NULL;
+}
+
+//Eliminar un Nodo del árbol
+NodoArbol* encontrarMinimo(NodoArbol* nodo) {
+	while (nodo->izquierdo != NULL) {
+		nodo = nodo->izquierdo;
+	}
+	return nodo;
+}
+void eliminarNodo(NodoArbol*& raiz, int id) {
+	if (raiz == NULL) {
+		cout << "ID: " << id << "...NO ENCONTRADO" << endl;
+		return;
+	} 
+
+	if (id < raiz->id) {
+		eliminarNodo(raiz->izquierdo, id);
+	}
+	else if (id > raiz->id) {
+		eliminarNodo(raiz->derecho, id);
+	}
+	else {
+
+		if (raiz->izquierdo == NULL) {
+			NodoArbol* temp = raiz->derecho;
+			cout << "ID: " << raiz->id << "...ELIMINADO" << endl;
+			delete raiz;
+			raiz = temp;
+		}
+		else if (raiz->derecho == NULL) {
+			NodoArbol* temp = raiz->izquierdo;
+			cout << "ID: " << raiz->id << "...ELIMINADO" << endl;
+			delete raiz;
+			raiz = temp;
+		}
+
+		else {
+
+			NodoArbol* temp = encontrarMinimo(raiz->derecho);
+
+			cout << "ID: " << raiz->id << "...ELIMINADO" << endl;
+
+			raiz->id = temp->id;
+			raiz->nombre = temp->nombre;
+			raiz->descripcion = temp->descripcion;
+
+			eliminarNodo(raiz->derecho, temp->id);
+		}
+	}
+}
+
+//Para las funciones de RECORRIDO
+void mostrarNodo(NodoArbol* nodo) {
+	cout << "ID: " << nodo->id
+		<< " | Nombre: " << nodo->nombre
+		<< " | Descripcion: " << nodo->descripcion << endl;
+}
+
+//FUNCIONES DE RECORRIDO
+void preOrden(NodoArbol* raiz) {
+	if (raiz == NULL) return;
+		// Mostrar raíz		
+		mostrarNodo(raiz);
+		// Recorrer subárbol izquierdo
+		preOrden(raiz->izquierdo);
+
+		// Recorrer subárbol derecho
+		preOrden(raiz->derecho);
+}
+
+void postOrden(NodoArbol* raiz) {
+	if (raiz == NULL) return;
+	postOrden(raiz->izquierdo);
+	postOrden(raiz->derecho);
+	mostrarNodo(raiz);
+}
+
+void inOrden(NodoArbol*raiz) {
+	if (raiz == NULL) return;
+	//Subarbol izquierdo
+	inOrden(raiz->izquierdo);
+	//RAIZ
+	mostrarNodo(raiz);
+	//Subarbol derecho
+	inOrden(raiz->derecho);
+}
+
+//IMPRIMIR ÁRBOL DE FORMA VERTICAL
+void imprimirArbolCentrado(NodoArbol* raiz) {
+
+	if (raiz == NULL) {
+		cout << "Arbol vacio\n";
+		return;
+	}
+
+	// ===== Calcular altura =====
+	queue<NodoArbol*> q;
+	q.push(raiz);
+
+	int altura = 0;
+
+	while (!q.empty()) {
+		int n = q.size();
+		altura++;
+
+		while (n--) {
+			NodoArbol* temp = q.front();
+			q.pop();
+
+			if (temp->izquierdo) q.push(temp->izquierdo);
+			if (temp->derecho) q.push(temp->derecho);
+		}
+	}
+
+	//Imprimir centrado
+	queue<NodoArbol*> cola;
+	cola.push(raiz);
+
+	for (int nivel = 1; nivel <= altura; nivel++) {
+
+		int cantidad = cola.size();
+
+		int espacios = pow(2, altura - nivel);
+
+		//Margen izquierdo
+		for (int i = 0; i < espacios; i++)
+			cout << "   ";
+
+		while (cantidad--) {
+
+			NodoArbol* actual = cola.front();
+			cola.pop();
+
+			if (actual) {
+				cout << actual->id;
+
+				cola.push(actual->izquierdo);
+				cola.push(actual->derecho);
+			}
+			else {
+				cout << " ";
+				cola.push(NULL);
+				cola.push(NULL);
+			}
+
+			//Espacio entre nodos
+			for (int i = 0; i < espacios * 2; i++)
+				cout << "   ";
+		}
+
+		cout << "\n\n";
+	}
+}
+
+//MENU ÁRBOL
+void menuArbol() {
+	int id;
+	string nombre, descripcion;
+	NodoArbol* resultado;
 	int opc;
-	string titulo = "Estructura de Pila";
-	string opciones[] = { "Ingreso de Datos de Pila", "Ver Datos en forma de Pila", "Modificar un dato", "Buscar un dato", "Eliminar un dato", "Atras (Menu Principal)"};
+	string titulo = "Estructura de Arbol";
+	string opciones[] = { "Ingreso de Datos de Arbol", "Buscar un dato", "Recorrer", "Eliminar un dato", "Eliminar todo el Arbol","Mostrar Arbol", "Atras (Menu Principal)" };
 	int n = sizeof(opciones) / sizeof(opciones[0]); //Tamaño del arreglo, que representa el # de opciones
-
 	do
 	{
 		opc = menu(titulo, opciones, n);
 		switch (opc) {
-		case 1: 
-			//AGREGAR EL PRODUCTO
+		case 1:
+			//INSERTAR DATOS
 			system("cls");
-			push(pila);
-			system("pause");
+			cout << "\n--- Registrando Nuevo Producto ---" << endl;
+			cout << "Ingrese ID: "; cin >> id;//Guardar datos
+			cin.ignore(1000, '\n');
+			cout << "Nombre del Producto: "; getline(cin, nombre); //Guardar datos
+			cout << "Descripcion: "; getline(cin, descripcion); //Guardar datos
+			insertarNodo(raiz, id, nombre, descripcion);
+			_getch();
 			break;
 		case 2:
-			//MOSTRAR LA PILA
+			//BUSCAR EN EL ARBOL
 			system("cls");
-			mostrarPila(pila);
+			cout << "Ingrese el ID a BUSCAR: ";
+			cin >> id;
+			resultado = buscarNodo(raiz, id);
+			if (resultado != NULL) {
+				cout << "\nID encontrado\n";
+				cout << "Nombre: " << resultado->nombre << endl;
+				cout << "Descripcion: " << resultado->descripcion << endl;
+			}
+			else {
+				cout << "ID: " << id << "...NO ENCONTRADO";
+			}
+			_getch();
 			break;
 		case 3:
-			//MODIFICAR
+			//RECORRER
 			system("cls");
-			int id; //ID a modificar
-			cout << "Ingrese el ID del producto que desea MODIFICAR: ";
-			cin >> id;
-			modificarPila(pila, id);
-			system("pause");
+			subMenuRecorrido();
 			break;
 		case 4:
-			//BUSCAR EL ID
+			//ELIMINAR
+			bool band;
 			system("cls");
-			int idB; //ID a buscar
-			cout << "Ingrese el ID para encontrar el producto: ";
-			cin >> idB;
-			buscarPila(pila, idB);
-			system("pause");
+			cout << "Ingrese el ID a ELIMINAR: ";
+			cin >> id;
+			eliminarNodo(raiz, id);
+			_getch();
 			break;
 		case 5:
-			//ELIMINAR EL ÚLTIMO
+			//ELIMINAR ARBOL
 			system("cls");
-			pop(pila);
+			eliminarArbol(raiz);
+			if (raiz == NULL)
+			{
+				cout << "ARBOL ELIMINADO CORRECTAMENTE";
+			}
 			_getch();
 			break;
 		case 6:
+			system("cls");
+			imprimirArbolCentrado(raiz);
+			_getch();
+			break;
+		case 7:
 			return;
 		default:
 			cout << "Opcion invalida." << endl;
@@ -1280,147 +1866,9 @@ void menuPila(){
 	} while (true);
 
 	system("pause");
+
 }
 
-//MENÚ PRINICIPAL
-int menuPrincipal() {
-	int n = 4;//OPCIONES DEL MENU PRINCIPAL
-	string titulo = "MEMU PRINCIPAL";
-	string opciones[] = { "Estrucutura de Pila", "Estructura de Cola", "Estructura Listas", "Salir"};
-
-	do
-	{
-		system("cls");
-		int opc = menu(titulo, opciones, n);
-		switch (opc) {
-		case 1:
-			menuPila();
-			break;
-		case 2:
-			menuCola();
-			break;
-		case 3:
-			menuListas();
-			break;
-		case 4: 
-			return 0;
-		}
-	} while (true);
-
-	cout << endl;
-	system("pause");
-}
-
-//PANTALLA DE INICIO
-void pantallaInicio() {
-	//LETRAS COLORIDAS
-	int xcol;
-
-	//CUADRO CON TEXTO
-	//Primera línea
-	color(14);
-	gotoxy(1, 2); cout << "╔";
-	gotoxy(1, 3); cout << "║";
-	gotoxy(1, 4); cout << "╚";
-
-	for (xcol =2 ; xcol<=118 ; xcol++)
-	{
-		gotoxy(xcol, 2); cout << "═";
-		gotoxy(xcol, 4); cout << "═";
-		Sleep(10);
-	}
-	gotoxy(119, 2); cout << "╗";
-	gotoxy(119, 3); cout << "║";
-	gotoxy(119, 4); cout << "╝";
-
-	//TEXTO EN EL CUADRO
-	char titulo[] = " VENTA DE AIRE ";
-	int longitud;
-	longitud = strlen(titulo);
-	int centro = (((119-longitud)/2)+1); //CENTRO DE LA PANTALLA = 53
-
-	for (xcol =2; xcol <= centro; xcol++)
-	{
-		int colorRandom = (rand() % 15) + 1;
-		color(colorRandom);
-		gotoxy(xcol, 3); cout << titulo;
-		Sleep(80);
-	}
-
-	color(7);
-	cout << "\n\n\n\n\t\t\t\t\t\tUNIVERSIDAD MARIANO GALVEZ";
-	cout << "\n\t\t\t\t\t\t  Ingenieria en Sistemas";
-
-	color(8);
-	cout << "\n\t\t\t\t\t------------------------------------------";
-
-	color(10);
-	cout << "\n\t\t\t\t\t\t  PROYECTO PILAS Y COLAS";
-
-	color(8);
-	cout << "\n\t\t\t\t\t------------------------------------------";
-
-	color(7);
-	cout << "\n\t\t\t\t\tJesus Armando Pantzey Santizo - 2290-24-24601";
-	cout << "\n\t\t\t\t\tMiqueas Otoniel Ixcaya Xajil - 2290-24-24181";
-	cout << "\n\t\t\t\t\tEli Emanuel Rosales Bala - 2290-24-14890";
-
-	color(14);
-	cout << "\n\n\t\t\t\t\t\t     PROGRAMACION III";
 
 
-	cout << endl;
-	system("pause");
-}
 
-//LOGO DE LA EMPRESA
-void logo() {
-
-	color(11);
-
-	cout << "\t\t\t================================================================================\n\n";
-
-	cout << "\t\t               █████╗ ██╗██████╗ ███████╗    ████████╗███████╗ ██████╗██╗  ██╗\n";
-	cout << "\t\t              ██╔══██╗██║██╔══██╗██╔════╝    ╚══██╔══╝██╔════╝██╔════╝██║  ██║\n";
-	cout << "\t\t              ███████║██║██████╔╝█████╗         ██║   █████╗  ██║     ███████║\n";
-	cout << "\t\t              ██╔══██║██║██╔══██╗██╔══╝         ██║   ██╔══╝  ██║     ██╔══██║\n";
-	cout << "\t\t              ██║  ██║██║██║  ██║███████╗       ██║   ███████╗╚██████╗██║  ██║\n";
-	cout << "\t\t              ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝       ╚═╝   ╚══════╝ ╚═════╝╚═╝  ╚═╝\n\n";
-
-	color(9);
-
-	cout << "\t\t                            ╔═════════════════════════════╗\n";
-	cout << "\t\t                        ╔═══╝   ~ ~ ~   A I R E   ~ ~ ~   ╚═══╗\n";
-	cout << "\t\t                     ╔══╝     ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈     ╚══╗\n";
-	cout << "\t\t                   ╔═╝      ≈     ≈     ≈     ≈     ≈     ≈      ╚═╗\n";
-	cout << "\t\t                  ║         ≈        Aire embolsada       ≈         ║\n";
-	cout << "\t\t                  ║         ≈     ≈     ≈     ≈     ≈     ≈         ║\n";
-	cout << "\t\t                   ╚═╗        ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈        ╔═╝\n";
-	cout << "\t\t                     ╚══╗      >>>>>>>>>>>>>>>>>>>>>>>>>      ╔══╝\n";
-	cout << "\t\t                        ╚═══╗    >>>   >>>   >>>   >>>    ╔═══╝\n";
-	cout << "\t\t                            ╚═════════════════════════════╝\n\n";
-
-	color(10);
-	cout << "\t\t\t                   \"Respira tecnologia. Controla el aire.\"\n\n";
-
-	color(8);
-	cout << "\t\t\t================================================================================\n";
-
-	color(7);
-	_getch();
-}
-
-int main()
-{
-	SetConsoleOutputCP(CP_UTF8);
-	SetConsoleCP(CP_UTF8);
-
-	login();
-	system("cls");
-	logo();
-	system("cls");
-	pantallaInicio();
-	system("cls");
-	color(7);
-	menuPrincipal();
-}
