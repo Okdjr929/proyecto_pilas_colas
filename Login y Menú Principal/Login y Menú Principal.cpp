@@ -81,7 +81,7 @@ struct NodoCola {
 	NodoCola* siguiente;       // Puntero al siguiente nodo
 };
 
-void encolar(int id, string nombre, string descripcion);
+void encolar(int, string, string);
 void mostrarCola();
 void desencolar();
 NodoCola* buscarCola(int id);
@@ -98,17 +98,21 @@ NodoCola* fin = NULL;
 // PROTOTIPO Y STRUCT LISTA SIMPLE
 //=============================
 struct NodoLista {
-	int dato;
+	int id;
+	string nombre;
+	string descripcion;
 	NodoLista* siguiente;
 };
 
 //=============================
 // PROTOTIPOS
 //=============================
-void insertarOrdenado(NodoLista*&, int);
+void insertarOrdenado(NodoLista*&, int, string, string);
 void mostrarLista(NodoLista*);
 void eliminarNodoLista(NodoLista*&, int);
 void vaciarLista(NodoLista*&);
+void buscarLista(NodoLista*, int);
+void modificarLista(NodoLista*, int);
 void menuListaSimple();
 
 
@@ -344,15 +348,54 @@ int menu(string titulo, string opciones[], int n) {
 
 	do
 	{
-		system("cls");
-		gotoxy(5, 3 + opcionSeleccionada); cout << "->";
-		gotoxy(15, 2); cout << titulo; //Imprimimos el titulo
-		//Imprimimos las opciones
+        system("cls");
+
+		// Selección de paleta: menú principal usa colores distintos al resto de submenús
+		int titleColor, selectedColor, optionColor, arrowColor, footerColor;
+		if (titulo == "MEMU PRINCIPAL") {
+			titleColor = 10;     // Verde
+			selectedColor = 14;  // Amarillo
+			optionColor = 15;    // Blanco brillante
+			arrowColor = 12;     // Rojo
+			footerColor = 8;     // Gris
+		} else {
+			titleColor = 13;     // Magenta
+			selectedColor = 10;  // Verde
+			optionColor = 11;    // Celeste
+			arrowColor = 14;     // Amarillo
+			footerColor = 8;     // Gris
+		}
+
+		// Título
+		color(titleColor);
+		gotoxy(15, 2); cout << titulo;
+		color(7); // reset
+
+		// Imprimimos las opciones, resaltando la seleccion
 		for (int i = 0; i < n; i++)
 		{
-			gotoxy(10, 4 + i); cout << i + 1 << ") " << opciones[i]; //Opcion i;
+			gotoxy(10, 4 + i);
+			if (i + 1 == opcionSeleccionada) {
+				color(selectedColor);
+				cout << i + 1 << ") " << opciones[i];
+				color(7);
+			} else {
+				color(optionColor);
+				cout << i + 1 << ") " << opciones[i];
+				color(7);
+			}
 
 		}
+
+		// Flecha indicadora
+		color(arrowColor);
+		gotoxy(5, 3 + opcionSeleccionada); cout << "->";
+		color(7);
+
+		// Pie de pagina con instrucciones en color tenue
+		color(footerColor);
+		gotoxy(5, 6 + n); cout << "Usa las flechas para navegar, Enter para seleccionar";
+		color(7);
 		//------------------------------------------
 
 		//Caputaramos la tecla
@@ -637,10 +680,13 @@ void mostrarPila(NodoPila* pila) {
 
 	NodoPila* aux = pila;
 	color(11); // Celeste
-	cout << "\n======= INVENTARIO EN PILA (LIFO) =======" << endl;
+    cout << "\n======= INVENTARIO EN PILA (LIFO) =======" << endl;
 	while (aux != NULL) {
-		cout << "ID: " << aux->id << endl;
-		cout << "Nombre: " << aux->nombre << endl;
+		// Mostrar la direccion del nodo, el dato y la direccion del siguiente
+		cout << "[" << (void*)aux << "] "
+			 << "ID: " << aux->id
+			 << " | Nombre: " << aux->nombre
+			 << " | (next: " << (void*)aux->siguiente << ")" << endl;
 		cout << "Descripcion: " << aux->descripcion << endl;
 		cout << "---------------------------------------" << endl;
 		aux = aux->siguiente;
@@ -738,13 +784,15 @@ void mostrarCola() {
 	NodoCola* aux = frente;
 
 	color(11); // Celeste
-	cout << "COLA DE INVENTARIO:\n\n";
+    cout << "COLA DE INVENTARIO:\n\n";
 
 	while (aux != NULL) {
-
-		cout << "[ID: " << aux->id
-			<< " | Nombre: " << aux->nombre
-			<< " | Desc: " << aux->descripcion << "]";
+		// Mostrar direccion del nodo, datos y direccion del siguiente
+		cout << "[" << (void*)aux << "] "
+			 << "ID: " << aux->id
+			 << " | Nombre: " << aux->nombre
+			 << " | Desc: " << aux->descripcion
+			 << " | (next: " << (void*)aux->siguiente << ")";
 
 		if (aux->siguiente != NULL) {
 			cout << " -> ";
@@ -900,14 +948,16 @@ void menuCola() {
 // DEFINICIÓN DE FUNCIONES LISTA-SIMPLE
 //=============================
 // INSERTAR ORDENADO (MENOR A MAYOR)
-void insertarOrdenado(NodoLista*& lista, int dato) {
+void insertarOrdenado(NodoLista*& lista, int id, string nombre, string descripcion) {
 	NodoLista* nuevo = new NodoLista();
-	nuevo->dato = dato;
+	nuevo->id = id;
+	nuevo->nombre = nombre;
+	nuevo->descripcion = descripcion;
 
 	NodoLista* aux1 = lista;
 	NodoLista* aux2 = NULL;
 
-	while (aux1 != NULL && aux1->dato < dato) {
+	while (aux1 != NULL && aux1->id < id) {
 		aux2 = aux1;
 		aux1 = aux1->siguiente;
 	}
@@ -936,15 +986,19 @@ void mostrarLista(NodoLista* lista) {
 		return;
 	}
 
+	cout << "\nLista Simple (direccion | dato | siguiente)\n";
 	while (aux != NULL) {
-		cout << aux->dato << " -> ";
+		// Mostrar la direccion del nodo, el dato y la direccion del siguiente
+		cout << "[" << (void*)aux << "] "
+			 << aux->id << " | " << aux->nombre << " | " << aux->descripcion << " -> "
+			 << "(next: " << (void*)aux->siguiente << ")" << endl;
 		aux = aux->siguiente;
 	}
-	cout << "NULL\n";
+	cout << "(NULL indica fin de lista)\n";
 }
 
 // ELIMINAR NODO (INICIO, MEDIO, FINAL)
-void eliminarNodoLista(NodoLista*& lista, int dato) {
+void eliminarNodoLista(NodoLista*& lista, int id) {
 	if (lista == NULL) {
 		cout << "Lista vacia\n";
 		return;
@@ -953,7 +1007,7 @@ void eliminarNodoLista(NodoLista*& lista, int dato) {
 	NodoLista* aux = lista;
 	NodoLista* anterior = NULL;
 
-	while (aux != NULL && aux->dato != dato) {
+	while (aux != NULL && aux->id != id) {
 		anterior = aux;
 		aux = aux->siguiente;
 	}
@@ -971,7 +1025,7 @@ void eliminarNodoLista(NodoLista*& lista, int dato) {
 	}
 
 	delete aux;
-	cout << "Dato eliminado\n";
+	cout << "Producto eliminado\n";
 }
 
 // VACIAR LISTA
@@ -987,44 +1041,97 @@ void vaciarLista(NodoLista*& lista) {
 	cout << "Lista vaciada\n";
 }
 
+//VOID BUSCAR EN LA LISTA
+void buscarLista(NodoLista* lista, int id) {
+	NodoLista* aux = lista;
+	while (aux != NULL) {
+		if (aux->id == id) {
+			cout << "Producto encontrado\n";
+			cout << aux->nombre << " | " << aux->descripcion << endl;
+			return;
+		}
+		aux = aux->siguiente;
+	}
+	cout << "ID no encontrado\n";
+}
+void modificarLista(NodoLista* lista, int id) {
+	NodoLista* aux = lista;
+	while (aux != NULL) {
+		if (aux->id == id) {
+			cout << "Producto encontrado\n";
+			cout << aux->nombre << " | " << aux->descripcion << endl;
+			cout << "Ingrese nuevo nombre: ";
+			cin.ignore();
+			getline(cin, aux->nombre);
+			cout << "Ingrese nueva descripcion: ";
+			getline(cin, aux->descripcion);
+			cout << "Producto modificado\n";
+			return;
+		}
+		aux = aux->siguiente;
+	}
+	cout << "ID no encontrado\n";
+}
+
 // MENU LISTA SIMPLE
 void menuListaSimple() {
 	NodoLista* lista = NULL;
-	int dato;
+	int id;
+	string nombre, descripcion;
 	string titulo = "Lista Simple";
-	string opciones[] = { "Insertar","Mostrar","Eliminar","Vaciar","Regresar" };
+	string opciones[] = { "Insertar","Eliminar Dato","Mostrar Datos", "Buscar", "Modificar","Vaciar Lista","Regresar" };
 	int n = sizeof(opciones) / sizeof(opciones[0]); //Tamaño del arreglo, que representa el # de opciones
 	do {
 		int opc = menu(titulo, opciones, n);
 		switch (opc) {
 		case 1:
 			system("cls");
-			cout << "Ingrese dato: ";
-			cin >> dato;
-			insertarOrdenado(lista, dato);
+			cout << "Ingrese ID: ";
+			cin >> id;
+			cin.ignore();
+			cout << "Ingrese nombre: ";
+			getline(cin, nombre);
+			cout << "Ingrese descripcion: ";
+			getline(cin, descripcion);
+			insertarOrdenado(lista, id, nombre, descripcion);
 			_getch();
 			break;
 
 		case 2:
 			system("cls");
-			mostrarLista(lista);
+			cout << "ID a eliminar: ";
+			cin >> id;
+			eliminarNodoLista(lista, id);
 			_getch();
 			break;
 
+
 		case 3:
 			system("cls");
-			cout << "Dato a eliminar: ";
-			cin >> dato;
-			eliminarNodoLista(lista, dato);
+			mostrarLista(lista);
 			_getch();
 			break;
 
 		case 4:
 			system("cls");
-			vaciarLista(lista);
+			cout << "ID a buscar: ";
+			cin >> id;
+			buscarLista(lista, id);
 			_getch();
 			break;
 		case 5:
+			system("cls");
+			cout << "ID a modificar: ";
+			cin >> id;
+			modificarLista(lista, id);
+			_getch();
+			break;
+		case 6:
+			system("cls");
+			vaciarLista(lista);
+			_getch();
+			break;
+		case 7:
 			return;
 		}
 
@@ -1104,10 +1211,13 @@ void mostrarDoble(NodoDoble* lista) {
 
 	NodoDoble* aux = lista;
 
+    cout << "\nLista Doble (direccion | anterior | siguiente | id | nombre)\n";
 	while (aux) {
-		cout << "ID: " << aux->id
-			<< " | Nombre: " << aux->nombre
-			<< " | Desc: " << aux->descripcion << endl;
+		cout << "[" << (void*)aux << "] "
+			<< "(prev: " << (void*)aux->anterior << ") "
+			<< "(next: " << (void*)aux->siguiente << ") "
+			<< "| ID: " << aux->id
+			<< " | Nombre: " << aux->nombre << endl;
 
 		aux = aux->siguiente;
 	}
@@ -1324,13 +1434,14 @@ void mostrarCircular() {
 		cout << "\nLista Vacía." << endl;
 		return;
 	}
-	nodoCircular* aux = primero;
+    nodoCircular* aux = primero;
+	cout << "\nLista Circular (direccion | dato | siguiente)\n";
 	do
 	{
-		cout << "|ID: " << aux->id
-			<< "|Nombre: " << aux->nombre
-			<< "|Desc: " << aux->descripcion
-			<< "| -> ";
+		cout << "[" << (void*)aux << "] "
+			<< "ID: " << aux->id
+			<< " | Nombre: " << aux->nombre
+			<< " | (next: " << (void*)aux->siguiente << ")" << endl;
 		aux = aux->siguiente;
 	} while (aux != primero);
 	cout << "(Regresa al inicio)" << endl;
