@@ -24,6 +24,7 @@
     <ProjectGuid>{554ab712-46fe-4829-a24c-ab10a1cd6a94}</ProjectGuid>
     <RootNamespace>LoginyMenúPrincipal</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Proyecto Final</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -127,7 +128,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Login y Menú Principal.cpp" />
+    <ClCompile Include="ArbolAVL.cpp" />
+    <ClCompile Include="ArbolBB.cpp" />
+    <ClCompile Include="Cola.cpp" />
+    <ClCompile Include="listaCircular.cpp" />
+    <ClCompile Include="listaDoble.cpp" />
+    <ClCompile Include="listaSimple.cpp" />
+    <ClCompile Include="Login.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="pantallasInicio.cpp" />
+    <ClCompile Include="Pila.cpp" />
+    <ClCompile Include="Utilidades.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArbolAVL.h" />
+    <ClInclude Include="ArbolBB.h" />
+    <ClInclude Include="Cola.h" />
+    <ClInclude Include="listaCircular.h" />
+    <ClInclude Include="listaDoble.h" />
+    <ClInclude Include="listaSimple.h" />
+    <ClInclude Include="Login.h" />
+    <ClInclude Include="pantallasInicio.h" />
+    <ClInclude Include="Pila.h" />
+    <ClInclude Include="Utilidades.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
