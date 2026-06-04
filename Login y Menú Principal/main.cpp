@@ -25,12 +25,12 @@ int main()
 {
 	SetConsoleOutputCP(CP_UTF8);
 	SetConsoleCP(CP_UTF8);
-	//login();
-	//PlaySound(TEXT("iron-man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	//system("cls");
-	//logo();
-	//system("cls");
-	//pantallaInicio();
+	login();
+	PlaySound(TEXT("iron-man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	system("cls");
+	logo();
+	system("cls");
+	pantallaInicio();
 	system("cls");
 	color(7);
 	menuPrincipal();
