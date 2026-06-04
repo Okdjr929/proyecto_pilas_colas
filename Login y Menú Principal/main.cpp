@@ -27,9 +27,9 @@ int main()
 	SetConsoleCP(CP_UTF8);
 	//login();
 	//PlaySound(TEXT("iron-man.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	system("cls");
-	logo();
-	system("cls");
+	//system("cls");
+	//logo();
+	//system("cls");
 	//pantallaInicio();
 	system("cls");
 	color(7);

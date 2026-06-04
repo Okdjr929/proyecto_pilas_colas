@@ -208,10 +208,10 @@ void mostrarPila(NodoPila* pila) {
 		cout << "│ ID        : " << left << setw(25) << aux->id << "│";
 
 		gotoxy(x, y++);
-		cout << "│ Nombre    : " << left << setw(25) << aux->nombre << "│";
+		cout << "│ Nombre    : " << left << setw(25) << aux->nombre.substr(0, 25) << "│";
 
 		gotoxy(x, y++);
-		cout << "│ Descrip...: " << left << setw(25) << aux->descripcion << "│";
+		cout << "│ Descrip...: " << left << setw(25) << aux->descripcion.substr(0, 25) << "│";
 
 		gotoxy(x, y++);
 		cout << "│ Precio    : " << left << setw(25) << aux->precio << "│";
